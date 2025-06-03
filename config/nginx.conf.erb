@@ -38,7 +38,7 @@ http {
 
 	server {
 		listen <%= ENV["PORT"] %>;
-		server_name _;
+		server_name ses-reverse-proxy-cca0eed59d46.herokuapp.com;
 		keepalive_timeout 5;
 		client_max_body_size <%= ENV['NGINX_CLIENT_MAX_BODY_SIZE'] || 1 %>M;
 
@@ -47,7 +47,7 @@ http {
 			return 301 https://$host$request_uri;
 		}
 
-		location ~ ^/(accounts|products|trial|seatdeactivate|dongles|newsuspiciousnodeids|reports|auth|javascripts|assets|stylesheets)? {
+		location ~ ^/(accounts|products|trial|seatdeactivate|dongles|newsuspiciousnodeids|reports|adminsetting|localization_resource|javascripts|assets|stylesheets)? {
 			proxy_set_header X-Access-Token eyJhbGciOiJSUzUxMiIsInR5cCI6IkpXVCJ9Cg.eyJ1bmlxdWVfbmFtZSI6InNlcmdlaS5wbG90bmlrb3ZAM2RzeXN0ZW1zLmNvbSJ9.UVD0qp34FFseoA18kA8MqTMk5WGPi1srwA6NkpWGQLNKkUgCN2a8O4zrips3uYxoNScdkpp1PJ-j_EQ3u5GZfrq3Mx8LDIYRbZXgQeGWNVKNd96VZWxvz3sPAKyHFQi6pXzNGFwLPlsjM6gcmcYN4yOhTZx04UkFHemNcaKIjTOMmZPPvrMy4WE0n09iPJzg9MphSGmfxUlsnyH7UpnLCh8aCw5n572B0kYVH-mU5bxvoYSrM7i40dq39WNJkvBy-KBgg8sl-zjZH0LQ7Yi5K7yrKzE5yNVpreolE_6Z-OT3dLYE_m-2eEdsu_KcrgB-2v79vAS9aZNjYS5opeSOJw;
 			proxy_set_header Uid mock@mock.com;
 			proxy_set_header Session mockSessionMockSession;
@@ -55,6 +55,37 @@ http {
 
 			proxy_pass    https://sesf-clone-b30b7df00a18.herokuapp.com;
 			proxy_set_header Host sesf-clone-b30b7df00a18.herokuapp.com;
+		}
+
+		## Define specific behaviors for sub directories and other locations.
+		# location /assets {
+		# 	expires 7d;
+		# }
+
+		## Custom error pages
+		# error_page 404 /404.html;
+		# error_page 500 /500.html;
+	}
+
+	server {
+		listen <%= ENV["PORT"] %>;
+		server_name qwerqwerqwer.xyz;
+		keepalive_timeout 5;
+		client_max_body_size <%= ENV['NGINX_CLIENT_MAX_BODY_SIZE'] || 1 %>M;
+
+		## HTTPS Only
+		if ($http_x_forwarded_proto != "https") {
+			return 301 https://$host$request_uri;
+		}
+
+		location ~ ^/(auth|users|products|trials|activations|machines|assets|new_suspicious|admin_data)? {
+			proxy_set_header X-Access-Token eyJhbGciOiJSUzUxMiIsInR5cCI6IkpXVCJ9Cg.eyJ1bmlxdWVfbmFtZSI6InNlcmdlaS5wbG90bmlrb3ZAM2RzeXN0ZW1zLmNvbSJ9.UVD0qp34FFseoA18kA8MqTMk5WGPi1srwA6NkpWGQLNKkUgCN2a8O4zrips3uYxoNScdkpp1PJ-j_EQ3u5GZfrq3Mx8LDIYRbZXgQeGWNVKNd96VZWxvz3sPAKyHFQi6pXzNGFwLPlsjM6gcmcYN4yOhTZx04UkFHemNcaKIjTOMmZPPvrMy4WE0n09iPJzg9MphSGmfxUlsnyH7UpnLCh8aCw5n572B0kYVH-mU5bxvoYSrM7i40dq39WNJkvBy-KBgg8sl-zjZH0LQ7Yi5K7yrKzE5yNVpreolE_6Z-OT3dLYE_m-2eEdsu_KcrgB-2v79vAS9aZNjYS5opeSOJw;
+			proxy_set_header Uid mock@mock.com;
+			proxy_set_header Session mockSessionMockSession;
+			proxy_set_header Client  mock_ClientMock_Client;
+
+			proxy_pass    https://ses-wrapper-81e1351688c2.herokuapp.com;
+			proxy_set_header Host ses-wrapper-81e1351688c2.herokuapp.com;
 		}
 
 		## Define specific behaviors for sub directories and other locations.
