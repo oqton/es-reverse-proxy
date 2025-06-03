@@ -47,7 +47,7 @@ http {
 			return 301 https://$host$request_uri;
 		}
 
-		location ~ ^/(accounts|products|trial|seatdeactivate|dongles|newsuspiciousnodeids|reports) {
+		location ~ ^/(accounts|products|trial|seatdeactivate|dongles|newsuspiciousnodeids|reports|javascripts|assets|stylesheets)? {
 			proxy_set_header X-Access-Token jwt_header.eyJ1bmlxdWVfbmFtZSI6InZhbGVyaWEua2lyemhuZXJAb3F0b24uY29tIn0.jwt_signiture;
 			proxy_set_header Uid mock@mock.com;
 			proxy_set_header Session mockSessionMockSession;
