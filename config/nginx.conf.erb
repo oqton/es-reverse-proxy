@@ -47,7 +47,7 @@ http {
 			return 301 https://$host$request_uri;
 		}
 
-		location ~ ^/(accounts|products|trial|seatdeactivate|dongles|newsuspiciousnodeids|reports|javascripts|assets|stylesheets)? {
+		location ~ ^/(accounts|products|trial|seatdeactivate|dongles|newsuspiciousnodeids|reports|auth|javascripts|assets|stylesheets)? {
 			proxy_set_header X-Access-Token eyJhbGciOiJSUzUxMiIsInR5cCI6IkpXVCJ9Cg.eyJ1bmlxdWVfbmFtZSI6InNlcmdlaS5wbG90bmlrb3ZAM2RzeXN0ZW1zLmNvbSJ9.UVD0qp34FFseoA18kA8MqTMk5WGPi1srwA6NkpWGQLNKkUgCN2a8O4zrips3uYxoNScdkpp1PJ-j_EQ3u5GZfrq3Mx8LDIYRbZXgQeGWNVKNd96VZWxvz3sPAKyHFQi6pXzNGFwLPlsjM6gcmcYN4yOhTZx04UkFHemNcaKIjTOMmZPPvrMy4WE0n09iPJzg9MphSGmfxUlsnyH7UpnLCh8aCw5n572B0kYVH-mU5bxvoYSrM7i40dq39WNJkvBy-KBgg8sl-zjZH0LQ7Yi5K7yrKzE5yNVpreolE_6Z-OT3dLYE_m-2eEdsu_KcrgB-2v79vAS9aZNjYS5opeSOJw;
 			proxy_set_header Uid mock@mock.com;
 			proxy_set_header Session mockSessionMockSession;
