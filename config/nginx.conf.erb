@@ -47,8 +47,46 @@ http {
 			return 301 https://$host$request_uri;
 		}
 
-		location ~ ^/(accounts|products|trial|seatdeactivate|dongles|newsuspiciousnodeids|reports|adminsetting|localization_resource|javascripts|assets|stylesheets)? {
-			proxy_set_header X-Access-Token eyJhbGciOiJSUzUxMiIsInR5cCI6IkpXVCJ9Cg.eyJ1bmlxdWVfbmFtZSI6InNlcmdlaS5wbG90bmlrb3ZAM2RzeXN0ZW1zLmNvbSJ9.UVD0qp34FFseoA18kA8MqTMk5WGPi1srwA6NkpWGQLNKkUgCN2a8O4zrips3uYxoNScdkpp1PJ-j_EQ3u5GZfrq3Mx8LDIYRbZXgQeGWNVKNd96VZWxvz3sPAKyHFQi6pXzNGFwLPlsjM6gcmcYN4yOhTZx04UkFHemNcaKIjTOMmZPPvrMy4WE0n09iPJzg9MphSGmfxUlsnyH7UpnLCh8aCw5n572B0kYVH-mU5bxvoYSrM7i40dq39WNJkvBy-KBgg8sl-zjZH0LQ7Yi5K7yrKzE5yNVpreolE_6Z-OT3dLYE_m-2eEdsu_KcrgB-2v79vAS9aZNjYS5opeSOJw;
+		location /oauth2/ {
+			proxy_pass       https://sso3-7c1fb87b6586.herokuapp.com;
+			proxy_set_header Host    sso3-7c1fb87b6586.herokuapp.com;
+			proxy_set_header X-Real-IP               $remote_addr;
+			proxy_set_header X-Scheme                $scheme;
+		}
+
+		location = /oauth2/sign_out {
+			# Sign-out mutates the session, only allow POST requests
+			if ($request_method != POST) {
+				return 405;
+			}
+
+			proxy_pass       https://sso3-7c1fb87b6586.herokuapp.com;
+			proxy_set_header Host    sso3-7c1fb87b6586.herokuapp.com;
+			proxy_set_header X-Real-IP               $remote_addr;
+			proxy_set_header X-Scheme                $scheme;
+		}
+
+		location = /oauth2/auth {
+			internal;
+			proxy_pass       https://sso3-7c1fb87b6586.herokuapp.com;
+			proxy_set_header Host    sso3-7c1fb87b6586.herokuapp.com;
+			proxy_set_header X-Real-IP        $remote_addr;
+			proxy_set_header X-Scheme         $scheme;
+			# nginx auth_request includes headers but not body
+			proxy_set_header Content-Length   "";
+			proxy_pass_request_body           off;
+		}
+
+		location / {
+			auth_request /oauth2/auth;
+
+			if ($http_authorization = "") {
+				error_page 401 = /oauth2/start;
+			}
+
+			auth_request_set $token  $upstream_http_x_auth_request_access_token;
+			proxy_set_header X-Access-Token $token;
+			# proxy_set_header X-Access-Token eyJhbGciOiJSUzUxMiIsInR5cCI6IkpXVCJ9Cg.eyJ1bmlxdWVfbmFtZSI6InNlcmdlaS5wbG90bmlrb3ZAM2RzeXN0ZW1zLmNvbSJ9.UVD0qp34FFseoA18kA8MqTMk5WGPi1srwA6NkpWGQLNKkUgCN2a8O4zrips3uYxoNScdkpp1PJ-j_EQ3u5GZfrq3Mx8LDIYRbZXgQeGWNVKNd96VZWxvz3sPAKyHFQi6pXzNGFwLPlsjM6gcmcYN4yOhTZx04UkFHemNcaKIjTOMmZPPvrMy4WE0n09iPJzg9MphSGmfxUlsnyH7UpnLCh8aCw5n572B0kYVH-mU5bxvoYSrM7i40dq39WNJkvBy-KBgg8sl-zjZH0LQ7Yi5K7yrKzE5yNVpreolE_6Z-OT3dLYE_m-2eEdsu_KcrgB-2v79vAS9aZNjYS5opeSOJw;
 			proxy_set_header Uid mock@mock.com;
 			proxy_set_header Session mockSessionMockSession;
 			proxy_set_header Client  mock_ClientMock_Client;
