@@ -148,7 +148,7 @@ http {
 			proxy_pass_request_body           off;
 		}
 
-		location ~ ^/(auth|users|products|trials|activations|machines|assets|new_suspicious|admin_data)? {
+		location / {
 			auth_request /oauth2/auth;
 
 			if ($http_authorization = "") {
