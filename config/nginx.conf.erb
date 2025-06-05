@@ -171,11 +171,6 @@ http {
 			proxy_set_header Session mockSessionMockSession;
 			proxy_set_header Client  mock_ClientMock_Client;
 			
-			proxy_hide_header Access-Control-Expose-Headers;
-			add_header Access-Control-Expose-Headers 'access-token, expiry, token-type, uid, client, trash';
-			proxy_hide_header Access-Control-Allow-Origin;
-			add_header Access-Control-Allow-Origin 'https://ses-reverse-proxy-cca0eed59d46.herokuapp.com';
-
 			proxy_pass    https://ses-wrapper-81e1351688c2.herokuapp.com;
 			proxy_set_header Host ses-wrapper-81e1351688c2.herokuapp.com;
 		}
