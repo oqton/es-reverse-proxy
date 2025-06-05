@@ -153,6 +153,7 @@ http {
 				add_header 'Access-Control-Allow-Origin' 'https://ses-reverse-proxy-cca0eed59d46.herokuapp.com' always;
 				add_header 'Access-Control-Allow-Methods' 'GET, POST, PUT, PATCH, DELETE, OPTIONS' always;
 				add_header 'Access-Control-Allow-Headers' 'if-modified-since, x-csrf-token, access-token, expiry, token-type, uid, client, trash' always;
+				add_header 'Access-Control-Allow-Credentials' 'true' always;
 				add_header 'Access-Control-Max-Age' 1728000;
 				add_header 'Content-Length' 0;
 				return 204;
