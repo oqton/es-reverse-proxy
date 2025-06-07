@@ -53,18 +53,8 @@ http {
 			proxy_set_header X-Real-IP               $remote_addr;
 			proxy_set_header X-Scheme                $scheme;
 			proxy_cookie_domain ses-reverse-proxy-cca0eed59d46.herokuapp.com test1.xyz;
-		}
-
-		location = /oauth2/sign_out {
-			# Sign-out mutates the session, only allow POST requests
-			if ($request_method != POST) {
-				return 405;
-			}
-
-			proxy_pass       https://sso3-7c1fb87b6586.herokuapp.com;
-			proxy_set_header Host    sso3-7c1fb87b6586.herokuapp.com;
-			proxy_set_header X-Real-IP               $remote_addr;
-			proxy_set_header X-Scheme                $scheme;
+			auth_request_set $auth_cookie $upstream_http_set_cookie;
+			add_header Set-Cookie $auth_cookie;
 		}
 
 		location = /oauth2/auth {
@@ -88,9 +78,6 @@ http {
 
 			auth_request_set $token  $upstream_http_x_auth_request_access_token;
 			proxy_set_header X-Access-Token $token;
-			proxy_set_header Uid mock@mock.com;
-			proxy_set_header Session mockSessionMockSession;
-			proxy_set_header Client  mock_ClientMock_Client;
 			add_header 'Set-Cookie' 'auth_headers=%7B%22access-token%22%3A%22AAAA_SSSS_DDDD_FFFF_XX%22%2C%22token-type%22%3A%22Bearer%22%2C%22client%22%3A%22AAAA_SSSS_DDDD_FFFF_YY%22%2C%22expiry%22%3A%221750164131%22%2C%22uid%22%3A%22mock.user%40mock.com%22%7D; path=/; domain=ses-reverse-proxy-cca0eed59d46.herokuapp.com;' always;
 			proxy_cookie_domain ses-reverse-proxy-cca0eed59d46.herokuapp.com test3.xyz;
 			auth_request_set $auth_cookie $upstream_http_set_cookie;
@@ -118,18 +105,6 @@ http {
 			proxy_set_header X-Real-IP               $remote_addr;
 			proxy_set_header X-Scheme                $scheme;
 			proxy_set_header X-Auth-Request-Redirect $scheme://$host$request_uri;
-		}
-
-		location = /oauth2/sign_out {
-			# Sign-out mutates the session, only allow POST requests
-			if ($request_method != POST) {
-				return 405;
-			}
-
-			proxy_pass       https://sso3-7c1fb87b6586.herokuapp.com;
-			proxy_set_header Host    sso3-7c1fb87b6586.herokuapp.com;
-			proxy_set_header X-Real-IP               $remote_addr;
-			proxy_set_header X-Scheme                $scheme;
 		}
 
 		location = /oauth2/auth {
@@ -162,9 +137,6 @@ http {
 
 			auth_request_set $token  $upstream_http_x_auth_request_access_token;
 			proxy_set_header X-Access-Token $token;
-			proxy_set_header Uid mock@mock.com;
-			proxy_set_header Session mockSessionMockSession;
-			proxy_set_header Client  mock_ClientMock_Client;
 
 			proxy_hide_header 'Access-Control-Expose-Headers';
 			add_header        'Access-Control-Expose-Headers' '*' always;
