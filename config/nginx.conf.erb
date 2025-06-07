@@ -109,7 +109,7 @@ http {
 		}
 
 		location /oauth2/ {
-			proxy_pass       https://sso3-7c1fb87b6586.herokuapp.com;
+			proxy_pass       https://sso3-7c1fb87b6586.herokuapp.com?rd=https://qwerqwerqwer.xyz;
 			proxy_set_header Host    sso3-7c1fb87b6586.herokuapp.com;
 			proxy_set_header X-Real-IP               $remote_addr;
 			proxy_set_header X-Scheme                $scheme;
@@ -129,7 +129,7 @@ http {
 
 		location = /oauth2/auth {
 			internal;
-			proxy_pass       https://sso3-7c1fb87b6586.herokuapp.com;
+			proxy_pass       https://sso3-7c1fb87b6586.herokuapp.com?rd=https://qwerqwerqwer.xyz;
 			proxy_set_header Host    sso3-7c1fb87b6586.herokuapp.com;
 			proxy_set_header X-Real-IP        $remote_addr;
 			proxy_set_header X-Scheme         $scheme;
