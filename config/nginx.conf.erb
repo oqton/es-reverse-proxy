@@ -93,6 +93,8 @@ http {
 			proxy_set_header Client  mock_ClientMock_Client;
 			#add_header 'Set-Cookie' 'auth_headers=%7B%22access-token%22%3A%22SOet1sJUUDcxts4-HMQOYw%22%2C%22token-type%22%3A%22Bearer%22%2C%22client%22%3A%22qlfBPXF2QIknI-P2ecT8Og%22%2C%22expiry%22%3A%221750164131%22%2C%22uid%22%3A%22sergei.plotnikov%403dsystems.com%22%7D; path=/; domain=ses-reverse-proxy-cca0eed59d46.herokuapp.com;' always;
 			proxy_cookie_domain ses-reverse-proxy-cca0eed59d46.herokuapp.com qwerqwerqwer.xyz;
+			auth_request_set $auth_cookie $upstream_http_set_cookie;
+			add_header X-Test-Header $auth_cookie;
 
 			proxy_pass    https://sesf-clone-b30b7df00a18.herokuapp.com;
 			proxy_set_header Host sesf-clone-b30b7df00a18.herokuapp.com;
