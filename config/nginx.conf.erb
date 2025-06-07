@@ -52,6 +52,7 @@ http {
 			proxy_set_header Host    sso3-7c1fb87b6586.herokuapp.com;
 			proxy_set_header X-Real-IP               $remote_addr;
 			proxy_set_header X-Scheme                $scheme;
+			proxy_cookie_domain ses-reverse-proxy-cca0eed59d46.herokuapp.com qwerqwerqwer.xyz;
 		}
 
 		location = /oauth2/auth {
