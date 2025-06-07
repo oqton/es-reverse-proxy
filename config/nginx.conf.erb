@@ -52,7 +52,7 @@ http {
 			proxy_set_header Host    sso3-7c1fb87b6586.herokuapp.com;
 			proxy_set_header X-Real-IP               $remote_addr;
 			proxy_set_header X-Scheme                $scheme;
-			proxy_cookie_domain ses-reverse-proxy-cca0eed59d46.herokuapp.com qwerqwerqwer.xyz;
+			proxy_cookie_domain ses-reverse-proxy-cca0eed59d46.herokuapp.com test1.xyz;
 		}
 
 		location = /oauth2/sign_out {
@@ -76,7 +76,7 @@ http {
 			# nginx auth_request includes headers but not body
 			proxy_set_header Content-Length   "";
 			proxy_pass_request_body           off;
-			proxy_cookie_domain ses-reverse-proxy-cca0eed59d46.herokuapp.com qwerqwerqwer.xyz;
+			proxy_cookie_domain ses-reverse-proxy-cca0eed59d46.herokuapp.com test2.xyz;
 		}
 
 		location / {
@@ -92,7 +92,7 @@ http {
 			proxy_set_header Session mockSessionMockSession;
 			proxy_set_header Client  mock_ClientMock_Client;
 			add_header 'Set-Cookie' 'auth_headers=%7B%22access-token%22%3A%22AAAA_SSSS_DDDD_FFFF_XX%22%2C%22token-type%22%3A%22Bearer%22%2C%22client%22%3A%22AAAA_SSSS_DDDD_FFFF_YY%22%2C%22expiry%22%3A%221750164131%22%2C%22uid%22%3A%22mock.user%40mock.com%22%7D; path=/; domain=ses-reverse-proxy-cca0eed59d46.herokuapp.com;' always;
-			proxy_cookie_domain ses-reverse-proxy-cca0eed59d46.herokuapp.com qwerqwerqwer.xyz;
+			proxy_cookie_domain ses-reverse-proxy-cca0eed59d46.herokuapp.com test3.xyz;
 			auth_request_set $auth_cookie $upstream_http_set_cookie;
 			add_header X-Test-Header $auth_cookie;
 
