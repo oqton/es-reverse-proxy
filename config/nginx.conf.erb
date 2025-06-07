@@ -109,10 +109,11 @@ http {
 		}
 
 		location /oauth2/ {
-			proxy_pass       https://sso3-7c1fb87b6586.herokuapp.com?rd=https%3A%2F%2Fses-reverse-proxy-cca0eed59d46.herokuapp.com;
+			proxy_pass       https://sso3-7c1fb87b6586.herokuapp.com;
 			proxy_set_header Host    sso3-7c1fb87b6586.herokuapp.com;
 			proxy_set_header X-Real-IP               $remote_addr;
 			proxy_set_header X-Scheme                $scheme;
+			proxy_set_header X-Auth-Request-Redirect $scheme://$host$request_uri;
 		}
 
 		location = /oauth2/sign_out {
@@ -129,10 +130,11 @@ http {
 
 		location = /oauth2/auth {
 			internal;
-			proxy_pass       https://sso3-7c1fb87b6586.herokuapp.com?rd=https%3A%2F%2Fses-reverse-proxy-cca0eed59d46.herokuapp.com;
+			proxy_pass       https://sso3-7c1fb87b6586.herokuapp.com;
 			proxy_set_header Host    sso3-7c1fb87b6586.herokuapp.com;
 			proxy_set_header X-Real-IP        $remote_addr;
 			proxy_set_header X-Scheme         $scheme;
+			proxy_set_header X-Forwarded-Uri  $request_uri;
 			# nginx auth_request includes headers but not body
 			proxy_set_header Content-Length   "";
 			proxy_pass_request_body           off;
