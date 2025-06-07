@@ -139,15 +139,15 @@ http {
 		}
 
 		location / {
-			# if ($request_method = 'OPTIONS') {
-			# 	add_header 'Access-Control-Allow-Origin' '*' always;
-			# 	add_header 'Access-Control-Allow-Methods' '*' always;
-			# 	add_header 'Access-Control-Allow-Headers' '*' always;
-			# 	add_header 'Access-Control-Allow-Credentials' 'true' always;
-			# 	add_header 'Access-Control-Max-Age' 1728000;
-			# 	add_header 'Content-Length' 0;
-			# 	return 204;
-			# }
+			if ($request_method = 'OPTIONS') {
+				add_header 'Access-Control-Allow-Origin' '*' always;
+				add_header 'Access-Control-Allow-Methods' '*' always;
+				add_header 'Access-Control-Allow-Headers' '*' always;
+				add_header 'Access-Control-Allow-Credentials' 'true' always;
+				add_header 'Access-Control-Max-Age' 1728000;
+				add_header 'Content-Length' 0;
+				return 204;
+			}
 			auth_request /oauth2/auth;
 
 			if ($http_authorization = "") {
