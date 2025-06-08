@@ -67,14 +67,14 @@ http {
 		}
 
 		location / {
-			auth_request /oauth2/auth;
+			# auth_request /oauth2/auth;
 
-			if ($http_authorization = "") {
-				error_page 401 = /oauth2/start;
-			}
+			# if ($http_authorization = "") {
+			#	error_page 401 = /oauth2/start;
+			# }
 
-			auth_request_set $token  $upstream_http_x_auth_request_access_token;
-			proxy_set_header X-Access-Token $token;
+			# auth_request_set $token  $upstream_http_x_auth_request_access_token;
+			# proxy_set_header X-Access-Token $token;
 			add_header 'Set-Cookie' 'auth_headers=%7B%22access-token%22%3A%22AAAA_SSSS_DDDD_FFFF_XX%22%2C%22token-type%22%3A%22Bearer%22%2C%22client%22%3A%22AAAA_SSSS_DDDD_FFFF_YY%22%2C%22expiry%22%3A%221750164131%22%2C%22uid%22%3A%22mock.user%40mock.com%22%7D; path=/; domain=.qwerqwerqwer.xyz;' always;
 
 			proxy_pass    https://sesf-clone-b30b7df00a18.herokuapp.com;
