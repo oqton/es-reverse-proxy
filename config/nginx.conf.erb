@@ -48,8 +48,8 @@ http {
 		}
 
 		location /oauth2/ {
-			proxy_pass       https://oa2proxy.qwerqwerqwer.xyz;
-			proxy_set_header Host    oa2proxy.qwerqwerqwer.xyz;
+			proxy_pass       https://sso3-7c1fb87b6586.herokuapp.com;
+			proxy_set_header Host    sso3-7c1fb87b6586.herokuapp.com;
 			proxy_set_header X-Real-IP               $remote_addr;
 			proxy_set_header X-Scheme                $scheme;
 			#proxy_cookie_domain qwerqwerqwer.xyz qwerqwerqwer.xyz;
@@ -57,8 +57,8 @@ http {
 
 		location = /oauth2/auth {
 			internal;
-			proxy_pass       https://oa2proxy.qwerqwerqwer.xyz;
-			proxy_set_header Host    oa2proxy.qwerqwerqwer.xyz;
+			proxy_pass       https://sso3-7c1fb87b6586.herokuapp.com;
+			proxy_set_header Host    sso3-7c1fb87b6586.herokuapp.com;
 			proxy_set_header X-Real-IP        $remote_addr;
 			proxy_set_header X-Scheme         $scheme;
 			# nginx auth_request includes headers but not body
@@ -94,8 +94,8 @@ http {
 		}
 
 		location /oauth2/ {
-			proxy_pass       https://oa2proxy.qwerqwerqwer.xyz;
-			proxy_set_header Host    oa2proxy.qwerqwerqwer.xyz;
+			proxy_pass       https://sso3-7c1fb87b6586.herokuapp.com;
+			proxy_set_header Host    sso3-7c1fb87b6586.herokuapp.com;
 			proxy_set_header X-Real-IP               $remote_addr;
 			proxy_set_header X-Scheme                $scheme;
 			proxy_set_header X-Auth-Request-Redirect $scheme://$host$request_uri;
@@ -103,8 +103,8 @@ http {
 
 		location = /oauth2/auth {
 			internal;
-			proxy_pass       https://oa2proxy.qwerqwerqwer.xyz;
-			proxy_set_header Host    oa2proxy.qwerqwerqwer.xyz;
+			proxy_pass       https://sso3-7c1fb87b6586.herokuapp.com;
+			proxy_set_header Host    sso3-7c1fb87b6586.herokuapp.com;
 			proxy_set_header X-Real-IP        $remote_addr;
 			proxy_set_header X-Scheme         $scheme;
 			proxy_set_header X-Forwarded-Uri  $request_uri;
@@ -132,15 +132,6 @@ http {
 			auth_request_set $token  $upstream_http_x_auth_request_access_token;
 			proxy_set_header X-Access-Token $token;
 
-			proxy_hide_header 'Access-Control-Expose-Headers';
-			add_header        'Access-Control-Expose-Headers' '*' always;
-			proxy_hide_header 'Access-Control-Allow-Origin';
-			add_header        'Access-Control-Allow-Origin' '*' always;
-			proxy_hide_header 'Access-Control-Allow-Methods';
-			add_header        'Access-Control-Allow-Methods' '*' always;
-			proxy_hide_header 'Access-Control-Allow-Headers';
-			add_header        'Access-Control-Allow-Headers' '*' always;
-			
 			proxy_pass    https://ses-wrapper-81e1351688c2.herokuapp.com;
 			proxy_set_header Host ses-wrapper-81e1351688c2.herokuapp.com;
 		}
