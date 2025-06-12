@@ -116,6 +116,10 @@ http {
 			proxy_pass_request_body           off;
 		}
 
+		location /auth/validate_token {
+			return 200;
+		}
+
 		location / {
 			if ($request_method = 'OPTIONS') {
 				add_header 'Access-Control-Allow-Origin' '*' always;
