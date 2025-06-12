@@ -54,10 +54,20 @@ http {
 			proxy_set_header X-Scheme                $scheme;
 			#proxy_cookie_domain qwerqwerqwer.xyz qwerqwerqwer.xyz;
 		}
-
 		location = /oauth2/auth {
 			internal;
 			proxy_pass       https://sso3-7c1fb87b6586.herokuapp.com;
+			proxy_set_header Host    sso3-7c1fb87b6586.herokuapp.com;
+			proxy_set_header X-Real-IP        $remote_addr;
+			proxy_set_header X-Scheme         $scheme;
+			# nginx auth_request includes headers but not body
+			proxy_set_header Content-Length   "";
+			proxy_pass_request_body           off;
+		}
+
+		location = /oauth2/callback {
+			internal;
+			proxy_pass       https://sso3-7c1fb87b6586.herokuapp.com?rd=https%3A%2F%2Fqwerqwerqwer.xyz%2Fproducts;
 			proxy_set_header Host    sso3-7c1fb87b6586.herokuapp.com;
 			proxy_set_header X-Real-IP        $remote_addr;
 			proxy_set_header X-Scheme         $scheme;
