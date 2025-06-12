@@ -75,7 +75,7 @@ http {
 
 			auth_request_set $token  $upstream_http_x_auth_request_access_token;
 			proxy_set_header X-Access-Token $token;
-			add_header 'Set-Cookie' 'auth_headers=%7B%22access-token%22%3A%22AAAA_SSSS_DDDD_FFFF_XX%22%2C%22token-type%22%3A%22Bearer%22%2C%22client%22%3A%22AAAA_SSSS_DDDD_FFFF_YY%22%2C%22expiry%22%3A%221750164131%22%2C%22uid%22%3A%22mock.user%40mock.com%22%7D; path=/; domain=qwerqwerqwer.xyz;' always;
+			add_header 'Set-Cookie' 'auth_headers=%7B%22access-token%22%3A%228DAMJeH_C34oGDCku8Lyew%22%2C%22token-type%22%3A%22Bearer%22%2C%22client%22%3A%22DCXgdN_5zJx_jZl1AyVoQw%22%2C%22expiry%22%3A%221750960473%22%2C%22uid%22%3A%22sergei.plotnikov%403dsystems.com%22%7D; path=/; domain=qwerqwerqwer.xyz;' always;
 			add_header 'Set-Cookie' '__Host-test=qwerty; path=/; secure;' always;
 			add_header 'Set-Cookie' '__Secure-test=qwerty; path=/; domain=qwerqwerqwer.xyz; secure;' always;
 			add_header 'Set-Cookie' '__Secure-test2=qwerty; path=/; secure;' always;
