@@ -98,7 +98,6 @@ http {
 			proxy_set_header Host    sso3-7c1fb87b6586.herokuapp.com;
 			proxy_set_header X-Real-IP               $remote_addr;
 			proxy_set_header X-Scheme                $scheme;
-			proxy_set_header X-Auth-Request-Redirect $scheme://$host$request_uri;
 		}
 
 		location = /oauth2/auth {
