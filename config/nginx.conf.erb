@@ -124,7 +124,7 @@ http {
 
 		location /auth/validate_token {
 			if ($request_method = 'OPTIONS') {
-				add_header 'Access-Control-Allow-Origin' '*' always;
+				add_header 'Access-Control-Allow-Origin' 'https://qwerqwerqwer.xyz' always;
 				add_header 'Access-Control-Allow-Methods' '*' always;
 				add_header 'Access-Control-Allow-Headers' '*' always;
 				add_header 'Access-Control-Allow-Credentials' 'true' always;
