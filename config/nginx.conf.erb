@@ -86,10 +86,10 @@ http {
 			add_header 'Set-Cookie' '__Secure-test3=qwerty; path=/; domain=; secure;' always;
 			add_header 'Set-Cookie' '__Secure-test4=qwerty; path=/; secure;' always;
 
-			proxy_pass    https://es-new-ui-testing-6b94918bdf15.herokuapp.com;
-			proxy_set_header Host es-new-ui-testing-6b94918bdf15.herokuapp.com;
-			#proxy_pass    https://sesf-clone-b30b7df00a18.herokuapp.com;
-			#proxy_set_header Host sesf-clone-b30b7df00a18.herokuapp.com;
+			#proxy_pass    https://es-new-ui-testing-6b94918bdf15.herokuapp.com;
+			#proxy_set_header Host es-new-ui-testing-6b94918bdf15.herokuapp.com;
+			proxy_pass    https://sesf-clone-b30b7df00a18.herokuapp.com;
+			proxy_set_header Host sesf-clone-b30b7df00a18.herokuapp.com;
 		}
 	}
 
@@ -139,7 +139,7 @@ http {
 
 		location / {
 			if ($request_method = 'OPTIONS') {
-				add_header 'Access-Control-Allow-Origin' '*' always;
+				add_header 'Access-Control-Allow-Origin' 'https://qwerqwerqwer.xyz' always;
 				add_header 'Access-Control-Allow-Methods' '*' always;
 				add_header 'Access-Control-Allow-Headers' '*' always;
 				add_header 'Access-Control-Allow-Credentials' 'true' always;
