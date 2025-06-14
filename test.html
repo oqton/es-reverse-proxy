@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<body>
+<pre id="demo">Fetch a file to change this text.</pre>
+
+<script>
+getText("fetch_info.txt");
+
+async function getText(file) {
+  let x = await fetch(
+    "https://backend.qwerqwerqwer.xyz/products",
+    {
+      method: "GET",
+      credentials: "include",
+    }
+  );
+  let y = await x.json();
+  document.getElementById("demo").innerHTML = JSON.stringify(y, null, 2);
+}
+</script>
+
+</body>
+</html>
