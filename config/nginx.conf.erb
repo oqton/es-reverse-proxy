@@ -169,6 +169,9 @@ http {
 				error_page 401 = /oauth2/start;
 			}
 
+			proxy_hide_header 'Access-Control-Allow-Origin';
+			add_header        'Access-Control-Allow-Origin' 'https://qwerqwerqwer.xyz' always;
+
 			auth_request_set $token  $upstream_http_x_auth_request_access_token;
 			proxy_set_header X-Access-Token $token;
 
