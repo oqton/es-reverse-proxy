@@ -70,6 +70,17 @@ http {
 			proxy_set_header Host yetanotherwebdev.blog;
 		}
 
+		location /test {
+			auth_request /oauth2/auth;
+
+			if ($http_authorization = "") {
+			error_page 401 = /oauth2/start;
+			}
+
+			root   /app/dist;
+			try_files $uri/ /test.html;
+		}
+
 		location / {
 			auth_request /oauth2/auth;
 
