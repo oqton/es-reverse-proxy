@@ -171,6 +171,8 @@ http {
 
 			proxy_hide_header 'Access-Control-Allow-Origin';
 			add_header        'Access-Control-Allow-Origin' 'https://qwerqwerqwer.xyz' always;
+			proxy_hide_header 'Access-Control-Allow-Credentials';
+			add_header        'Access-Control-Allow-Credentials' 'true' always;
 
 			auth_request_set $token  $upstream_http_x_auth_request_access_token;
 			proxy_set_header X-Access-Token $token;
