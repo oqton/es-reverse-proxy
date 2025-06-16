@@ -48,16 +48,16 @@ http {
 		}
 
 		location /oauth2/ {
-			proxy_pass       https://sso3-7c1fb87b6586.herokuapp.com;
-			proxy_set_header Host    sso3-7c1fb87b6586.herokuapp.com;
+			proxy_pass       https://es-staging-auth-7e2d24522499.herokuapp.com;
+			proxy_set_header Host    es-staging-auth-7e2d24522499.herokuapp.com;
 			proxy_set_header X-Real-IP               $remote_addr;
 			proxy_set_header X-Scheme                $scheme;
 			#proxy_cookie_domain qwerqwerqwer.xyz qwerqwerqwer.xyz;
 		}
 		location = /oauth2/auth {
 			internal;
-			proxy_pass       https://sso3-7c1fb87b6586.herokuapp.com;
-			proxy_set_header Host    sso3-7c1fb87b6586.herokuapp.com;
+			proxy_pass       https://es-staging-auth-7e2d24522499.herokuapp.com;
+			proxy_set_header Host    es-staging-auth-7e2d24522499.herokuapp.com;
 			proxy_set_header X-Real-IP        $remote_addr;
 			proxy_set_header X-Scheme         $scheme;
 			# nginx auth_request includes headers but not body
@@ -121,16 +121,16 @@ http {
 		}
 
 		location /oauth2/ {
-			proxy_pass       https://sso3-7c1fb87b6586.herokuapp.com;
-			proxy_set_header Host    sso3-7c1fb87b6586.herokuapp.com;
+			proxy_pass       https://es-staging-auth-7e2d24522499.herokuapp.com;
+			proxy_set_header Host    es-staging-auth-7e2d24522499.herokuapp.com;
 			proxy_set_header X-Real-IP               $remote_addr;
 			proxy_set_header X-Scheme                $scheme;
 		}
 
 		location = /oauth2/auth {
 			internal;
-			proxy_pass       https://sso3-7c1fb87b6586.herokuapp.com;
-			proxy_set_header Host    sso3-7c1fb87b6586.herokuapp.com;
+			proxy_pass       https://es-staging-auth-7e2d24522499.herokuapp.com;
+			proxy_set_header Host    es-staging-auth-7e2d24522499.herokuapp.com;
 			proxy_set_header X-Real-IP        $remote_addr;
 			proxy_set_header X-Scheme         $scheme;
 			# nginx auth_request includes headers but not body
