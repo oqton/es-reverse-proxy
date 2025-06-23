@@ -149,6 +149,8 @@ http {
 			auth_request_set $token  $upstream_http_x_auth_request_access_token;
 			proxy_set_header X-Access-Token $token;
 
+			proxy_set_header X-Symetric-Secret '<%= ENV["SYMETRIC_SECRET"] %>';
+
 			proxy_set_header Origin https://<%= ENV["BACKEND_DOMAIN"] %>;
 			proxy_pass              https://<%= ENV["BACKEND_DOMAIN"] %>;
 			proxy_set_header Host           <%= ENV["BACKEND_DOMAIN"] %>;
