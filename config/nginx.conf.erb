@@ -52,6 +52,7 @@ http {
 			proxy_set_header Host    <%= ENV["OAUTH2PROXY_DOMAIN"] %>;
 			proxy_set_header X-Real-IP               $remote_addr;
 			proxy_set_header X-Scheme                $scheme;
+			proxy_cookie_domain <%= ENV["ES_DOMAIN"] %> 'garbage.com';
 		}
 		location = /oauth2/auth {
 			internal;
