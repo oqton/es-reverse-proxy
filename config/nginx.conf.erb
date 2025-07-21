@@ -22,6 +22,7 @@ http {
 	gzip_comp_level 2;
 	gzip_min_length 512;
 	gzip_proxied any; # Heroku router sends Via header
+	server_names_hash_bucket_size  64;
 
 	server_tokens off;
 
