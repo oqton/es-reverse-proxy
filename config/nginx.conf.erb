@@ -23,6 +23,7 @@ http {
 	gzip_min_length 512;
 	gzip_proxied any; # Heroku router sends Via header
 	server_names_hash_bucket_size  128;
+	map_hash_bucket_size           128;
 
 	server_tokens off;
 
@@ -36,6 +37,23 @@ http {
 
 	client_body_timeout <%= ENV['NGINX_CLIENT_BODY_TIMEOUT'] || 5 %>;
 	# Must read the body in 5 seconds.
+
+	map $request_uri $asset_uri {
+		/localization_resource?locale=cs-CZ&name=resource_ui https://<%= ENV["ES_DOMAIN"] %>/localization/cs-CZ/resource_ui.json;
+		/localization_resource?locale=de-DE&name=resource_ui https://<%= ENV["ES_DOMAIN"] %>/localization/de-DE/resource_ui.json;
+		/localization_resource?locale=en-US&name=resource_ui https://<%= ENV["ES_DOMAIN"] %>/localization/en-US/resource_ui.json;
+		/localization_resource?locale=es-ES&name=resource_ui https://<%= ENV["ES_DOMAIN"] %>/localization/es-ES/resource_ui.json;
+		/localization_resource?locale=fr-FR&name=resource_ui https://<%= ENV["ES_DOMAIN"] %>/localization/fr-FR/resource_ui.json;
+		/localization_resource?locale=it-IT&name=resource_ui https://<%= ENV["ES_DOMAIN"] %>/localization/it-IT/resource_ui.json;
+		/localization_resource?locale=ja-JP&name=resource_ui https://<%= ENV["ES_DOMAIN"] %>/localization/ja-JP/resource_ui.json;
+		/localization_resource?locale=ko-KR&name=resource_ui https://<%= ENV["ES_DOMAIN"] %>/localization/ko-KR/resource_ui.json;
+		/localization_resource?locale=pl-PL&name=resource_ui https://<%= ENV["ES_DOMAIN"] %>/localization/pl-PL/resource_ui.json;
+		/localization_resource?locale=pt-BR&name=resource_ui https://<%= ENV["ES_DOMAIN"] %>/localization/pt-BR/resource_ui.json;
+		/localization_resource?locale=ru-RU&name=resource_ui https://<%= ENV["ES_DOMAIN"] %>/localization/ru-RU/resource_ui.json;
+		/localization_resource?locale=tr-TR&name=resource_ui https://<%= ENV["ES_DOMAIN"] %>/localization/tr-TR/resource_ui.json;
+		/localization_resource?locale=zh-CN&name=resource_ui https://<%= ENV["ES_DOMAIN"] %>/localization/zh-CN/resource_ui.json;
+		/localization_resource?locale=zh-TW&name=resource_ui https://<%= ENV["ES_DOMAIN"] %>/localization/zh-TW/resource_ui.json;
+	}
 
 	server {
 		listen <%= ENV["PORT"] %>;
@@ -53,7 +71,6 @@ http {
 			proxy_set_header Host    <%= ENV["OAUTH2PROXY_DOMAIN"] %>;
 			proxy_set_header X-Real-IP               $remote_addr;
 			proxy_set_header X-Scheme                $scheme;
-			proxy_cookie_domain <%= ENV["ES_DOMAIN"] %> 'garbage.com';
 		}
 		location = /oauth2/auth {
 			internal;
@@ -71,15 +88,26 @@ http {
 			proxy_set_header Host <%= ENV["ASSETS_DOMAIN"] %>;
 		}
 
-		location /test {
-			auth_request /oauth2/auth;
-
-			if ($http_authorization = "") {
-			error_page 401 = /oauth2/start;
+		location ^~ /assets {
+			proxy_pass    https://<%= ENV["FRONTEND_DOMAIN"] %>;
+			proxy_set_header Host <%= ENV["FRONTEND_DOMAIN"] %>;
+		}
+		location ^~ /stylesheets {
+			proxy_pass    https://<%= ENV["FRONTEND_DOMAIN"] %>;
+			proxy_set_header Host <%= ENV["FRONTEND_DOMAIN"] %>;
+		}
+		location ^~ /localization_resource {
+			if ($asset_uri) {
+				return 301 $asset_uri;
 			}
-
-			root   /app/dist;
-			try_files $uri/ /index.html;
+		}
+		location ^~ /localization/ {
+			root /app;
+			try_files $request_uri =404;
+		}
+		location /offline {
+			proxy_pass    https://<%= ENV["FRONTEND_DOMAIN"] %>;
+			proxy_set_header Host <%= ENV["FRONTEND_DOMAIN"] %>;
 		}
 
 		location / {
@@ -92,6 +120,13 @@ http {
 			auth_request_set $token  $upstream_http_x_auth_request_access_token;
 			proxy_set_header X-Access-Token $token;
 			add_header 'Set-Cookie' 'auth_headers=%7B%22access-token%22%3A%22AAAA_SSSS_DDDD_FFFF_XX%22%2C%22token-type%22%3A%22Bearer%22%2C%22client%22%3A%22AAAA_SSSS_DDDD_FFFF_YY%22%2C%22expiry%22%3A%222000000000%22%2C%22uid%22%3A%22mock%40mock.com%22%7D; path=/; domain=<%= ENV["ES_DOMAIN"] %>;' always;
+
+			if ($uri = "/" ) {
+				rewrite /        https://<%= ENV["ES_DOMAIN"] %>/products redirect;
+			}
+			if ($uri = "/signin" ) {
+				rewrite /signin  https://<%= ENV["ES_DOMAIN"] %>/products redirect;
+			}
 
 			proxy_pass    https://<%= ENV["FRONTEND_DOMAIN"] %>;
 			proxy_set_header Host <%= ENV["FRONTEND_DOMAIN"] %>;
