@@ -55,6 +55,11 @@ http {
 		/localization_resource?locale=zh-TW&name=resource_ui https://<%= ENV["ES_DOMAIN"] %>/localization/zh-TW/resource_ui.json;
 	}
 
+	map $http_origin $allow_origin {
+		'https://<%= ENV["ES_DOMAIN"] %>'       $http_origin;
+		'https://local.<%= ENV["ES_DOMAIN"] %>' $http_origin;
+	}
+
 	server {
 		listen <%= ENV["PORT"] %>;
 		server_name <%= ENV["ES_DOMAIN"] %>;
@@ -186,7 +191,7 @@ http {
 
 		location / {
 			if ($request_method = 'OPTIONS') {
-				add_header 'Access-Control-Allow-Origin' 'https://<%= ENV["ES_DOMAIN"] %>' always;
+				add_header 'Access-Control-Allow-Origin' $allow_origin always;
 				add_header 'Access-Control-Allow-Methods' 'GET, POST, PUT, PATCH, DELETE, OPTIONS, HEAD' always;
 				add_header 'Access-Control-Allow-Headers' 'Content-Type, X-CSRF-Token, Uid, Client, Access-Token, Token-Type, Expiry, If-Modified-Since' always;
 				add_header 'Access-Control-Allow-Credentials' 'true' always;
@@ -206,14 +211,13 @@ http {
 			}
 
 			proxy_hide_header 'Access-Control-Allow-Origin';
-			add_header        'Access-Control-Allow-Origin' 'https://<%= ENV["ES_DOMAIN"] %>' always;
+			add_header        'Access-Control-Allow-Origin' $allow_origin always;
 			proxy_hide_header 'Access-Control-Allow-Credentials';
 			add_header        'Access-Control-Allow-Credentials' 'true' always;
 
 			auth_request_set $token  $upstream_http_x_auth_request_access_token;
 			proxy_set_header X-Access-Token $token;
 
-			proxy_set_header X-Symetric-Secret '<%= ENV["SYMETRIC_SECRET"] %>';
 
 			proxy_set_header Origin https://<%= ENV["BACKEND_DOMAIN"] %>;
 			proxy_pass              https://<%= ENV["BACKEND_DOMAIN"] %>;
