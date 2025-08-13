@@ -162,6 +162,28 @@ http {
 			proxy_pass_request_body           off;
 		}
 
+		location ^~ /api {
+			if ($request_method = 'OPTIONS') {
+				add_header 'Access-Control-Allow-Origin' 'https://<%= ENV["ES_DOMAIN"] %>' always;
+				add_header 'Access-Control-Allow-Methods' 'GET, POST, PUT, PATCH, DELETE, OPTIONS, HEAD' always;
+				add_header 'Access-Control-Allow-Headers' 'Content-Type, X-CSRF-Token, Uid, Client, Access-Token, Token-Type, Expiry, If-Modified-Since' always;
+				add_header 'Access-Control-Allow-Credentials' 'true' always;
+				add_header 'Access-Control-Max-Age' 1728000;
+				add_header 'Content-Length' 0;
+				return 204;
+			}
+
+			proxy_hide_header 'Access-Control-Allow-Origin';
+			add_header        'Access-Control-Allow-Origin' 'https://<%= ENV["ES_DOMAIN"] %>' always;
+			proxy_hide_header 'Access-Control-Allow-Credentials';
+			add_header        'Access-Control-Allow-Credentials' 'true' always;
+
+			proxy_set_header Origin https://<%= ENV["BACKEND_DOMAIN"] %>;
+			proxy_pass              https://<%= ENV["BACKEND_DOMAIN"] %>;
+			proxy_set_header Host           <%= ENV["BACKEND_DOMAIN"] %>;
+			proxy_http_version 1.1;
+		}
+
 		location / {
 			if ($request_method = 'OPTIONS') {
 				add_header 'Access-Control-Allow-Origin' 'https://<%= ENV["ES_DOMAIN"] %>' always;
@@ -172,6 +194,11 @@ http {
 				add_header 'Content-Length' 0;
 				return 204;
 			}
+
+			if ($uri = "/" ) {
+				rewrite /        https://backend.<%= ENV["ES_DOMAIN"] %>/api-docs/index.html redirect;
+			}
+
 			auth_request /oauth2/auth;
 
 			if ($http_authorization = "") {
