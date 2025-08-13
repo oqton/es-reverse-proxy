@@ -186,13 +186,13 @@ function HEX_ES_STAGING_DEPLOY_OA2PROXY() {
 	`' --redis-connection-url=\"$REDIS_URL\"'`
 	`' --provider=\"oidc\"'`
 	`' --oidc-email-claim=\"sub\"'`
-	`' --cookie-domain=\"es.staging.3dsystems.com\"'`
+	`' --cookie-domain=\"geomagic-entitlement-mi-staging.hexagon.com\"'`
 	`' --cookie-name=\"_oauth2_proxy\"'`
 	`' --cookie-refresh=\"30m\"'`
 	`' --email-domain=\"*\"'`
 	`' --htpasswd-file=\".htpasswd\"'`
 	`' --pass-access-token=\"true\"'`
-	`' --provider-display-name=\"3DSystems SSO\"'`
+	`' --provider-display-name=\"3DSystems dev SSO\"'`
 	`' --redis-insecure-skip-tls-verify=\"true\"'`
 	`' --session-store-type=\"redis\"'`
 	`' --set-xauthrequest=\"true\"'`
@@ -227,8 +227,8 @@ EOM
 		return 1
 	fi
 
-	heroku redis:credentials $REDIS_URL --reset --app 'auth-staging-hex'
-	heroku config:set OAUTH2_PROXY_COOKIE_SECRET=$(__generate_oa2p_cookie_secret) --app 'auth-staging-hex'
+	#heroku redis:credentials $REDIS_URL --reset --app 'auth-staging-hex'
+	#heroku config:set OAUTH2_PROXY_COOKIE_SECRET=$(__generate_oa2p_cookie_secret) --app 'auth-staging-hex'
 
 	local HEX_STAGING_DB_URL=
 	HEX_STAGING_DB_URL=$(heroku config:get DATABASE_URL --app ses-staging-hex)
