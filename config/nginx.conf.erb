@@ -88,31 +88,21 @@ http {
 			proxy_pass_request_body           off;
 		}
 
-		location /javascripts {
-			proxy_pass    https://<%= ENV["ASSETS_DOMAIN"] %>;
-			proxy_set_header Host <%= ENV["ASSETS_DOMAIN"] %>;
-		}
-
-		location ^~ /assets {
+		location ~ ^/(assets|stylesheets|javascripts)/ {
 			proxy_pass    https://<%= ENV["FRONTEND_DOMAIN"] %>;
 			proxy_set_header Host <%= ENV["FRONTEND_DOMAIN"] %>;
-		}
-		location ^~ /stylesheets {
-			proxy_pass    https://<%= ENV["FRONTEND_DOMAIN"] %>;
-			proxy_set_header Host <%= ENV["FRONTEND_DOMAIN"] %>;
-		}
-		location ^~ /localization_resource {
-			if ($asset_uri) {
-				return 301 $asset_uri;
-			}
-		}
-		location ^~ /localization/ {
-			root /app;
-			try_files $request_uri =404;
 		}
 		location /offline {
 			proxy_pass    https://<%= ENV["FRONTEND_DOMAIN"] %>;
 			proxy_set_header Host <%= ENV["FRONTEND_DOMAIN"] %>;
+		}
+
+		location ^~ /localization_resource {
+			return 301 $asset_uri;
+		}
+		location ^~ /localization/ {
+			root /app;
+			try_files $request_uri =404;
 		}
 
 		location / {
@@ -121,10 +111,6 @@ http {
 			if ($http_authorization = "") {
 			      error_page 401 = /oauth2/start;
 			}
-
-			auth_request_set $token  $upstream_http_x_auth_request_access_token;
-			proxy_set_header X-Access-Token $token;
-			add_header 'Set-Cookie' 'auth_headers=%7B%22access-token%22%3A%22AAAA_SSSS_DDDD_FFFF_XX%22%2C%22token-type%22%3A%22Bearer%22%2C%22client%22%3A%22AAAA_SSSS_DDDD_FFFF_YY%22%2C%22expiry%22%3A%222000000000%22%2C%22uid%22%3A%22mock%40mock.com%22%7D; path=/; domain=<%= ENV["ES_DOMAIN"] %>;' always;
 
 			if ($uri = "/" ) {
 				rewrite /        https://<%= ENV["ES_DOMAIN"] %>/products redirect;
@@ -135,6 +121,7 @@ http {
 
 			proxy_pass    https://<%= ENV["FRONTEND_DOMAIN"] %>;
 			proxy_set_header Host <%= ENV["FRONTEND_DOMAIN"] %>;
+			proxy_http_version 1.1;
 		}
 	}
 
@@ -167,28 +154,6 @@ http {
 			proxy_pass_request_body           off;
 		}
 
-		location ^~ /api {
-			if ($request_method = 'OPTIONS') {
-				add_header 'Access-Control-Allow-Origin' 'https://<%= ENV["ES_DOMAIN"] %>' always;
-				add_header 'Access-Control-Allow-Methods' 'GET, POST, PUT, PATCH, DELETE, OPTIONS, HEAD' always;
-				add_header 'Access-Control-Allow-Headers' 'Content-Type, X-CSRF-Token, Uid, Client, Access-Token, Token-Type, Expiry, If-Modified-Since' always;
-				add_header 'Access-Control-Allow-Credentials' 'true' always;
-				add_header 'Access-Control-Max-Age' 1728000;
-				add_header 'Content-Length' 0;
-				return 204;
-			}
-
-			proxy_hide_header 'Access-Control-Allow-Origin';
-			add_header        'Access-Control-Allow-Origin' 'https://<%= ENV["ES_DOMAIN"] %>' always;
-			proxy_hide_header 'Access-Control-Allow-Credentials';
-			add_header        'Access-Control-Allow-Credentials' 'true' always;
-
-			proxy_set_header Origin https://<%= ENV["BACKEND_DOMAIN"] %>;
-			proxy_pass              https://<%= ENV["BACKEND_DOMAIN"] %>;
-			proxy_set_header Host           <%= ENV["BACKEND_DOMAIN"] %>;
-			proxy_http_version 1.1;
-		}
-
 		location / {
 			if ($request_method = 'OPTIONS') {
 				add_header 'Access-Control-Allow-Origin' $allow_origin always;
@@ -204,20 +169,10 @@ http {
 				rewrite /        https://backend.<%= ENV["ES_DOMAIN"] %>/api-docs/index.html redirect;
 			}
 
-			auth_request /oauth2/auth;
-
-			if ($http_authorization = "") {
-				error_page 401 = /oauth2/start;
-			}
-
 			proxy_hide_header 'Access-Control-Allow-Origin';
 			add_header        'Access-Control-Allow-Origin' $allow_origin always;
 			proxy_hide_header 'Access-Control-Allow-Credentials';
 			add_header        'Access-Control-Allow-Credentials' 'true' always;
-
-			auth_request_set $token  $upstream_http_x_auth_request_access_token;
-			proxy_set_header X-Access-Token $token;
-
 
 			proxy_set_header Origin https://<%= ENV["BACKEND_DOMAIN"] %>;
 			proxy_pass              https://<%= ENV["BACKEND_DOMAIN"] %>;
