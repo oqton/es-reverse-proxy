@@ -115,9 +115,9 @@ http {
 			if ($uri = "/" ) {
 				rewrite /        https://<%= ENV["ES_DOMAIN"] %>/products redirect;
 			}
-			#if ($uri = "/signin" ) {
-				#rewrite /signin  https://<%= ENV["ES_DOMAIN"] %>/products redirect;
-			#}
+			if ($uri = "/signin" ) {
+				rewrite /signin  https://<%= ENV["ES_DOMAIN"] %>/products redirect;
+			}
 
 			proxy_pass    https://<%= ENV["FRONTEND_DOMAIN"] %>;
 			proxy_set_header Host <%= ENV["FRONTEND_DOMAIN"] %>;
