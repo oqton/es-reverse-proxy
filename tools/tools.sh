@@ -36,7 +36,14 @@ function __create_htpasswd_from_1pass_items() {
 
 	while read -r line
 	do
-		htpasswd -bB -C 12 "$HTPASSWD_FILEPATH" $(__get_username_password_from_1pass_login_item "$line" | awk -v FS=':' '{print $1 " " $2}') > /dev/null 2>&1 
+		local USERNAME_SEMICOLON_PASSWORD=
+		USERNAME_SEMICOLON_PASSWORD=$(__get_username_password_from_1pass_login_item "$line")
+		if [[ $? -ne 0 ]]; then
+			>&2 echo "ERROR__create_htpasswd_from_1pass_items: failed to get 1pass content for $line"
+			return 1
+		fi
+
+		htpasswd -bB -C 12 "$HTPASSWD_FILEPATH" $(echo "$USERNAME_SEMICOLON_PASSWORD" | awk -v FS=':' '{print $1 " " $2}')
 		if [[ $? -ne 0 ]]; then
 			>&2 echo "ERROR__create_htpasswd_from_1pass_items: failed to add $line credentials"
 			return 1
@@ -279,3 +286,6 @@ function __extract_filename_from_url() {
 	echo "$archive"
 }
 
+function __generate_oa2p_cookie_secret(){
+	dd if=/dev/urandom bs=32 count=1 2>/dev/null | base64 | tr -d -- '\n' | tr -- '+/' '-_' ; echo
+}
