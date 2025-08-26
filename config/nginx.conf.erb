@@ -23,6 +23,7 @@ http {
 	gzip_min_length 512;
 	gzip_proxied any; # Heroku router sends Via header
 	server_names_hash_bucket_size  128;
+	map_hash_bucket_size           128;
 
 	server_tokens off;
 
@@ -36,6 +37,28 @@ http {
 
 	client_body_timeout <%= ENV['NGINX_CLIENT_BODY_TIMEOUT'] || 5 %>;
 	# Must read the body in 5 seconds.
+
+	map $request_uri $asset_uri {
+		/localization_resource?locale=cs-CZ&name=resource_ui https://<%= ENV["ES_DOMAIN"] %>/localization/cs-CZ/resource_ui.json;
+		/localization_resource?locale=de-DE&name=resource_ui https://<%= ENV["ES_DOMAIN"] %>/localization/de-DE/resource_ui.json;
+		/localization_resource?locale=en-US&name=resource_ui https://<%= ENV["ES_DOMAIN"] %>/localization/en-US/resource_ui.json;
+		/localization_resource?locale=es-ES&name=resource_ui https://<%= ENV["ES_DOMAIN"] %>/localization/es-ES/resource_ui.json;
+		/localization_resource?locale=fr-FR&name=resource_ui https://<%= ENV["ES_DOMAIN"] %>/localization/fr-FR/resource_ui.json;
+		/localization_resource?locale=it-IT&name=resource_ui https://<%= ENV["ES_DOMAIN"] %>/localization/it-IT/resource_ui.json;
+		/localization_resource?locale=ja-JP&name=resource_ui https://<%= ENV["ES_DOMAIN"] %>/localization/ja-JP/resource_ui.json;
+		/localization_resource?locale=ko-KR&name=resource_ui https://<%= ENV["ES_DOMAIN"] %>/localization/ko-KR/resource_ui.json;
+		/localization_resource?locale=pl-PL&name=resource_ui https://<%= ENV["ES_DOMAIN"] %>/localization/pl-PL/resource_ui.json;
+		/localization_resource?locale=pt-BR&name=resource_ui https://<%= ENV["ES_DOMAIN"] %>/localization/pt-BR/resource_ui.json;
+		/localization_resource?locale=ru-RU&name=resource_ui https://<%= ENV["ES_DOMAIN"] %>/localization/ru-RU/resource_ui.json;
+		/localization_resource?locale=tr-TR&name=resource_ui https://<%= ENV["ES_DOMAIN"] %>/localization/tr-TR/resource_ui.json;
+		/localization_resource?locale=zh-CN&name=resource_ui https://<%= ENV["ES_DOMAIN"] %>/localization/zh-CN/resource_ui.json;
+		/localization_resource?locale=zh-TW&name=resource_ui https://<%= ENV["ES_DOMAIN"] %>/localization/zh-TW/resource_ui.json;
+	}
+
+	map $http_origin $allow_origin {
+		'https://<%= ENV["ES_DOMAIN"] %>'       $http_origin;
+		'https://local.<%= ENV["ES_DOMAIN"] %>' $http_origin;
+	}
 
 	server {
 		listen <%= ENV["PORT"] %>;
@@ -65,20 +88,21 @@ http {
 			proxy_pass_request_body           off;
 		}
 
-		location /javascripts {
-			proxy_pass    https://<%= ENV["ASSETS_DOMAIN"] %>;
-			proxy_set_header Host <%= ENV["ASSETS_DOMAIN"] %>;
+		location ~ ^/(assets|stylesheets|javascripts)/ {
+			proxy_pass    https://<%= ENV["FRONTEND_DOMAIN"] %>;
+			proxy_set_header Host <%= ENV["FRONTEND_DOMAIN"] %>;
+		}
+		location /offline {
+			proxy_pass    https://<%= ENV["FRONTEND_DOMAIN"] %>;
+			proxy_set_header Host <%= ENV["FRONTEND_DOMAIN"] %>;
 		}
 
-		location /test {
-			auth_request /oauth2/auth;
-
-			if ($http_authorization = "") {
-			error_page 401 = /oauth2/start;
-			}
-
-			root   /app/dist;
-			try_files $uri/ /index.html;
+		location ^~ /localization_resource {
+			return 301 $asset_uri;
+		}
+		location ^~ /localization/ {
+			root /app;
+			try_files $request_uri =404;
 		}
 
 		location / {
@@ -87,13 +111,18 @@ http {
 			if ($http_authorization = "") {
 			      error_page 401 = /oauth2/start;
 			}
-
-			auth_request_set $token  $upstream_http_x_auth_request_access_token;
-			proxy_set_header X-Access-Token $token;
 			add_header 'Set-Cookie' 'auth_headers=%7B%22access-token%22%3A%22AAAA_SSSS_DDDD_FFFF_XX%22%2C%22token-type%22%3A%22Bearer%22%2C%22client%22%3A%22AAAA_SSSS_DDDD_FFFF_YY%22%2C%22expiry%22%3A%222000000000%22%2C%22uid%22%3A%22mock%40mock.com%22%7D; path=/; domain=<%= ENV["ES_DOMAIN"] %>;' always;
+
+			if ($uri = "/" ) {
+				rewrite /        https://<%= ENV["ES_DOMAIN"] %>/products redirect;
+			}
+			if ($uri = "/signin" ) {
+				rewrite /signin  https://<%= ENV["ES_DOMAIN"] %>/products redirect;
+			}
 
 			proxy_pass    https://<%= ENV["FRONTEND_DOMAIN"] %>;
 			proxy_set_header Host <%= ENV["FRONTEND_DOMAIN"] %>;
+			proxy_http_version 1.1;
 		}
 	}
 
@@ -108,49 +137,9 @@ http {
 			return 301 https://$host$request_uri;
 		}
 
-		location /oauth2/ {
-			proxy_pass       https://<%= ENV["OAUTH2PROXY_DOMAIN"] %>;
-			proxy_set_header Host    <%= ENV["OAUTH2PROXY_DOMAIN"] %>;
-			proxy_set_header X-Real-IP               $remote_addr;
-			proxy_set_header X-Scheme                $scheme;
-		}
-
-		location = /oauth2/auth {
-			internal;
-			proxy_pass       https://<%= ENV["OAUTH2PROXY_DOMAIN"] %>;
-			proxy_set_header Host    <%= ENV["OAUTH2PROXY_DOMAIN"] %>;
-			proxy_set_header X-Real-IP        $remote_addr;
-			proxy_set_header X-Scheme         $scheme;
-			# nginx auth_request includes headers but not body
-			proxy_set_header Content-Length   "";
-			proxy_pass_request_body           off;
-		}
-
-		location ^~ /api {
-			if ($request_method = 'OPTIONS') {
-				add_header 'Access-Control-Allow-Origin' 'https://<%= ENV["ES_DOMAIN"] %>' always;
-				add_header 'Access-Control-Allow-Methods' 'GET, POST, PUT, PATCH, DELETE, OPTIONS, HEAD' always;
-				add_header 'Access-Control-Allow-Headers' 'Content-Type, X-CSRF-Token, Uid, Client, Access-Token, Token-Type, Expiry, If-Modified-Since' always;
-				add_header 'Access-Control-Allow-Credentials' 'true' always;
-				add_header 'Access-Control-Max-Age' 1728000;
-				add_header 'Content-Length' 0;
-				return 204;
-			}
-
-			proxy_hide_header 'Access-Control-Allow-Origin';
-			add_header        'Access-Control-Allow-Origin' 'https://<%= ENV["ES_DOMAIN"] %>' always;
-			proxy_hide_header 'Access-Control-Allow-Credentials';
-			add_header        'Access-Control-Allow-Credentials' 'true' always;
-
-			proxy_set_header Origin https://<%= ENV["BACKEND_DOMAIN"] %>;
-			proxy_pass              https://<%= ENV["BACKEND_DOMAIN"] %>;
-			proxy_set_header Host           <%= ENV["BACKEND_DOMAIN"] %>;
-			proxy_http_version 1.1;
-		}
-
 		location / {
 			if ($request_method = 'OPTIONS') {
-				add_header 'Access-Control-Allow-Origin' 'https://<%= ENV["ES_DOMAIN"] %>' always;
+				add_header 'Access-Control-Allow-Origin' $allow_origin always;
 				add_header 'Access-Control-Allow-Methods' 'GET, POST, PUT, PATCH, DELETE, OPTIONS, HEAD' always;
 				add_header 'Access-Control-Allow-Headers' 'Content-Type, X-CSRF-Token, Uid, Client, Access-Token, Token-Type, Expiry, If-Modified-Since' always;
 				add_header 'Access-Control-Allow-Credentials' 'true' always;
@@ -163,21 +152,10 @@ http {
 				rewrite /        https://backend.<%= ENV["ES_DOMAIN"] %>/api-docs/index.html redirect;
 			}
 
-			auth_request /oauth2/auth;
-
-			if ($http_authorization = "") {
-				error_page 401 = /oauth2/start;
-			}
-
 			proxy_hide_header 'Access-Control-Allow-Origin';
-			add_header        'Access-Control-Allow-Origin' 'https://<%= ENV["ES_DOMAIN"] %>' always;
+			add_header        'Access-Control-Allow-Origin' $allow_origin always;
 			proxy_hide_header 'Access-Control-Allow-Credentials';
 			add_header        'Access-Control-Allow-Credentials' 'true' always;
-
-			auth_request_set $token  $upstream_http_x_auth_request_access_token;
-			proxy_set_header X-Access-Token $token;
-
-			proxy_set_header X-Symetric-Secret '<%= ENV["SYMETRIC_SECRET"] %>';
 
 			proxy_set_header Origin https://<%= ENV["BACKEND_DOMAIN"] %>;
 			proxy_pass              https://<%= ENV["BACKEND_DOMAIN"] %>;
