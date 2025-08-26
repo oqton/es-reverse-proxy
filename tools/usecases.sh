@@ -164,15 +164,6 @@ EOM
 	return 0
 }
 
-echo '
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-!!!!!                                                                      !!!!!
-!!!!!  WARNING: HEX_ES_STAGING_DEPLOY_OA2PROXY setup for zxcvzxcvzxcv.xyz  !!!!!
-!!!!!                                                                      !!!!!
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-'
 function HEX_ES_STAGING_DEPLOY_OA2PROXY() {
 	if [ $# -ne 1 ]; then
 		>&2 echo "ERROR__HEX_ES_STAGING_DEPLOY_OA2PROXY: not enough params."
@@ -192,7 +183,7 @@ function HEX_ES_STAGING_DEPLOY_OA2PROXY() {
 	`' --email-domain=\"*\"'`
 	`' --htpasswd-file=\".htpasswd\"'`
 	`' --pass-access-token=\"true\"'`
-	`' --provider-display-name=\"3DSystems dev SSO\"'`
+	`' --provider-display-name=\"Hexagon SSO\"'`
 	`' --redis-insecure-skip-tls-verify=\"true\"'`
 	`' --session-store-type=\"redis\"'`
 	`' --set-xauthrequest=\"true\"'`
@@ -248,10 +239,8 @@ EOM
 	--field-separator=':' \
 	--tuples-only \
 	--no-align \
-	--command="SELECT uid, encrypted_password FROM users WHERE encrypted_password LIKE '\$2a\$%' AND (LOWER(uid) LIKE '%@3dsystems.com' OR LOWER(uid) LIKE '%@oqton.com')" \
+	--command="SELECT uid, encrypted_password FROM users WHERE encrypted_password LIKE '\$2a\$%' AND (LOWER(uid) LIKE '%@3dsystems.com' OR LOWER(uid) LIKE '%@oqton.com' OR LOWER(uid) LIKE '%@hexagon.com')" \
 	>> "$HTPASSWD_FILEPATH"
-
-	echo 'sergei.plotnikov@3dsystems.com:$2a$10$y6IoUN4yJ.YSY1szBJFLiu0P6fkOw602zDDeoepeZOhhMlufLhbcW' >> "$HTPASSWD_FILEPATH"
 
 	local EXECUTABLE_PATH="$WORKDIR/$EXECUTALE_FILENAME"
 	__create_oauth2_proxy_app $WORKDIR $OAUTH2_PROXY_DOWNLOAD_LINK $EXECUTABLE_PATH
